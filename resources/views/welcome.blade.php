@@ -28,10 +28,13 @@
                 url :"/create-user",
                 type : 'post',
                 data : formData,
-          processData : false,
-          contentType : false,
-                success : function(){
-                    console.log("done")
+                processData : false,
+                contentType : false,
+                success : function(res){
+                    if(res.success){
+                        console.log(res.data)
+                        window.location.href = '/login'
+                    }
                 },
                 error : function(xhr){
                     console.log(xhr)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -16,7 +17,6 @@ class UserController extends Controller
             'email'    => 'required',
             'number'   => 'required',
             'password' => 'required',
-            'role'     => 'required'
         ]);
 
         if ($validate->fails()) {
@@ -30,13 +30,44 @@ class UserController extends Controller
             'name'     => $request->name,
             'email'    => $request->email,
             'number'   => $request->number,
-            'password' => bcrypt($request->passwrod),
-            'role'     => $request->role
+            'role'     => $request->role,
+            'password' => bcrypt($request->password),
         ]);
 
         return response()->json([
             'message' => 'User create',
-            'user'  => $user
+            'success' => true,
+            'user'  => $user,
+            'role' => $request->role,
         ]);
+    }
+
+    function userLogin(Request $request){
+
+        $validate = Validator::make($request->all(),[
+            'email'     => 'required|email',
+            'password'  => 'required|string'
+        ]);
+
+        if($validate->fails()){
+          return  response()->json([
+                'message' => 'Invalide credentiols',
+                'error'   => $validate->errors(),
+            ]);
+        };
+
+        $userForLogin = User::where('email', $request->email)->first();
+        if(!$userForLogin){
+            return response()->json([
+                'message' => "User does'nt Exist",
+            ],404);
+        };
+
+        if(Hash::check($request->password, $userForLogin->password)){
+            dd("password maches",$userForLogin);
+        }else {
+            dd('invalide credentiols');
+        }
+
     }
 }
