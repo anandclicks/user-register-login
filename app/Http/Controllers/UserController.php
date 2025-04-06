@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -43,11 +44,11 @@ class UserController extends Controller
     }
 
     function userLogin(Request $request){
-
         $validate = Validator::make($request->all(),[
             'email'     => 'required|email',
             'password'  => 'required|string'
         ]);
+
 
         if($validate->fails()){
           return  response()->json([
@@ -64,10 +65,18 @@ class UserController extends Controller
         };
 
         if(Hash::check($request->password, $userForLogin->password)){
-            dd("password maches",$userForLogin);
+           Auth::login($userForLogin);
+           return response()->json([
+            'message' => "Logged In Successsfuzl!",
+            'user'    => $userForLogin->except('password'),
+            'success' => true
+           ], 200);
         }else {
             dd('invalide credentiols');
         }
+    }
 
+    function showCreatePost(){
+        return view("createPost", ['user' => Auth::user()]);
     }
 }

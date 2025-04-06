@@ -26,7 +26,9 @@
       processData : false,
       contentType : false,
       success : function(res){
-        console.log(res);
+        if(res.success){
+          window.open('/createPost', '_self')
+        }
       },
       error : function(xhr){
         console.log(xhr.error)
